@@ -4,6 +4,8 @@ import { useNavigate, Link } from "react-router";
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [me, setMe] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +17,7 @@ export default function Home() {
       }
 
       try {
-        const response = await fetch("http://localhost:3000/blogPosts", {
+        const response = await fetch(`http://localhost:3000/blogPosts?page=${page}&limit=6`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -28,7 +30,9 @@ export default function Home() {
         if (response.ok && meResponse.ok) {
           const data = await response.json();
           const meData = await meResponse.json();
-          setPosts(data);
+
+          setPosts(data.posts);
+          setTotalPages(data.totalPages);
           setMe(meData);
         } else {
           localStorage.removeItem("token");
@@ -40,13 +44,14 @@ export default function Home() {
     };
 
     fetchPosts();
-  }, [navigate]);
+  }, [navigate, page]);
 
   // FUNZIONE PER ELIMINARE IL POST
   const handleDelete = async (postId) => {
     if (!window.confirm("Sei sicuro di voler eliminare questo post?")) return;
 
     const token = localStorage.getItem("token");
+
     try {
       const response = await fetch(`http://localhost:3000/blogPosts/${postId}`, {
         method: "DELETE",
@@ -67,9 +72,13 @@ export default function Home() {
 
   return (
     <div className="container mt-5">
-      <div className="d-flex justify-content-between">
+      <div className="d-flex justify-content-between align-items-center">
         <h1>Benvenuto su Strive Blog</h1>
+        <Link to="/create" className="btn btn-success">
+          Nuovo Post
+        </Link>
       </div>
+
       <div className="row mt-4">
         {posts.map((post) => (
           <div key={post._id} className="col-md-4 mb-3">
@@ -95,12 +104,9 @@ export default function Home() {
 
                   {me && post.author === me.email && (
                     <div className="d-flex align-items-center gap-3">
-                      {/* Icona Modifica */}
                       <Link to={`/edit/${post._id}`} className="text-warning d-inline-flex align-items-center" style={{ textDecoration: "none" }}>
                         <i className="bi bi-pencil fs-5" title="Modifica post"></i>
                       </Link>
-
-                      {/* Icona Cestino */}
                       <i
                         className="bi bi-trash3 text-danger fs-5"
                         onClick={() => handleDelete(post._id)}
@@ -117,6 +123,20 @@ export default function Home() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="d-flex justify-content-center align-items-center gap-3 mt-4 mb-5">
+        <button className="btn btn-outline-primary" disabled={page === 1} onClick={() => setPage(page - 1)}>
+          Precedente
+        </button>
+
+        <span>
+          Pagina <strong>{page}</strong> di {totalPages}
+        </span>
+
+        <button className="btn btn-outline-primary" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
+          Successiva
+        </button>
       </div>
     </div>
   );
