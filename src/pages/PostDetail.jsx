@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import EmojiPicker from "emoji-picker-react";
+import ReactMarkdown from "react-markdown";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -9,6 +11,7 @@ export default function PostDetail() {
   const navigate = useNavigate();
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editText, setEditText] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -34,15 +37,12 @@ export default function PostDetail() {
         console.error(err);
       }
     };
-
     fetchPost();
   }, [id, navigate]);
 
-  // FUNZIONE PER INVIARE IL COMMENTO
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-
     try {
       const res = await fetch(`http://localhost:3000/blogPosts/${id}/comments`, {
         method: "POST",
@@ -52,21 +52,25 @@ export default function PostDetail() {
         },
         body: JSON.stringify({ text: newComment }),
       });
-
       if (res.ok) {
         const updatedComments = await res.json();
-
         setPost({ ...post, comments: updatedComments });
         setNewComment("");
-      } else {
-        alert("Errore durante l'invio del commento");
       }
     } catch (err) {
-      console.error("Errore invio commento:", err);
+      console.error(err);
     }
   };
 
-  // Funzione per inviare la modifica al backend
+  const onEmojiClick = (emojiData) => {
+    setNewComment((prev) => prev + emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const insertFormat = (tag) => {
+    setNewComment((prev) => `${prev}${tag}testo${tag}`);
+  };
+
   const handleUpdateComment = async (commentId) => {
     const token = localStorage.getItem("token");
     try {
@@ -78,40 +82,30 @@ export default function PostDetail() {
         },
         body: JSON.stringify({ text: editText }),
       });
-
       if (res.ok) {
         const updatedComments = await res.json();
         setPost({ ...post, comments: updatedComments });
         setEditingCommentId(null);
       }
     } catch (err) {
-      console.error("Errore modifica:", err);
+      console.error(err);
     }
   };
 
-  //FUNZIONE PER CANCELLARE UN COMMENTO
-
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Sei sicuro di voler eliminare questo commento?")) return;
-
+    if (!window.confirm("Sei sicuro?")) return;
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(`http://localhost:3000/blogPosts/${id}/comments/${commentId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       if (res.ok) {
         const updatedComments = await res.json();
-
         setPost({ ...post, comments: updatedComments });
-      } else {
-        alert("Errore durante l'eliminazione del commento");
       }
     } catch (err) {
-      console.error("Errore delete comment:", err);
+      console.error(err);
     }
   };
 
@@ -126,14 +120,8 @@ export default function PostDetail() {
       <article>
         <img src={post.cover} alt={post.title} className="img-fluid rounded shadow mb-4" style={{ width: "100%", maxHeight: "500px", objectFit: "cover" }} />
         <h1 className="display-4">{post.title}</h1>
-        <div className="d-flex gap-2 mb-4 text-muted">
-          <span>
-            Categoria: <strong>{post.category}</strong>
-          </span>{" "}
-          |
-          <span>
-            Autore: <strong>{post.author}</strong>
-          </span>
+        <div className="text-muted mb-4">
+          Categoria: <strong>{post.category}</strong> | Autore: <strong>{post.author}</strong>
         </div>
         <hr />
         <p style={{ whiteSpace: "pre-wrap", fontSize: "1.2rem" }}>{post.content}</p>
@@ -144,22 +132,40 @@ export default function PostDetail() {
       <section className="comments-section">
         <h3>Commenti ({post.comments?.length || 0})</h3>
 
-        <form onSubmit={handleCommentSubmit} className="mt-4 mb-5">
-          <div className="mb-3">
-            <textarea
-              className="form-control"
-              rows="3"
-              placeholder="Cosa ne pensi? Lascia un commento..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              required
-            ></textarea>
+        {/* FORM NUOVO COMMENTO */}
+        <form onSubmit={handleCommentSubmit} className="mt-4 mb-5 shadow-sm p-3 bg-white rounded border">
+          <div className="d-flex gap-2 mb-2">
+            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => insertFormat("**")} title="Grassetto">
+              <i className="bi bi-type-bold"></i>
+            </button>
+            <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => insertFormat("*")} title="Corsivo">
+              <i className="bi bi-type-italic"></i>
+            </button>
+            <div className="position-relative">
+              <button type="button" className="btn btn-sm btn-outline-warning" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                😀
+              </button>
+              {showEmojiPicker && (
+                <div className="position-absolute z-3 mt-2">
+                  <EmojiPicker onEmojiClick={onEmojiClick} />
+                </div>
+              )}
+            </div>
           </div>
-          <button type="submit" className="btn btn-primary">
+          <textarea
+            className="form-control mb-2"
+            rows="3"
+            placeholder="Scrivi un commento..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            required
+          />
+          <button type="submit" className="btn btn-primary btn-sm">
             Invia commento
           </button>
         </form>
 
+        {/* LISTA COMMENTI */}
         <div className="comments-list">
           {post.comments && post.comments.length > 0 ? (
             post.comments.map((comment) => (
@@ -169,8 +175,6 @@ export default function PostDetail() {
                     <strong className="text-primary">{comment.author}</strong>
                     <div className="d-flex align-items-center gap-2">
                       <small className="text-muted">{new Date(comment.createdAt).toLocaleDateString()}</small>
-
-                      {/* MOSTRA ICONA MODIFICA SOLO SE SEI L'AUTORE */}
                       {me && comment.author === me.email && (
                         <div className="d-flex gap-2">
                           <i
@@ -180,22 +184,14 @@ export default function PostDetail() {
                               setEditingCommentId(comment._id);
                               setEditText(comment.text);
                             }}
-                            title="Modifica commento"
                           ></i>
-
-                          <i
-                            className="bi bi-trash3 text-danger"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => handleDeleteComment(comment._id)}
-                            title="Elimina commento"
-                          ></i>
+                          <i className="bi bi-trash3 text-danger" style={{ cursor: "pointer" }} onClick={() => handleDeleteComment(comment._id)}></i>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {editingCommentId === comment._id ? (
-                    // INTERFACCIA DI MODIFICA
                     <div className="mt-2">
                       <textarea className="form-control mb-2" value={editText} onChange={(e) => setEditText(e.target.value)} />
                       <div className="d-flex gap-2">
@@ -208,8 +204,9 @@ export default function PostDetail() {
                       </div>
                     </div>
                   ) : (
-                    // VISUALIZZAZIONE NORMALE
-                    <p className="card-text">{comment.text}</p>
+                    <div className="card-text">
+                      <ReactMarkdown>{comment.text}</ReactMarkdown>
+                    </div>
                   )}
                 </div>
               </div>
