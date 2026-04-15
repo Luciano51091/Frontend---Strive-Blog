@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar.jsx";
 import CreatePost from "./components/CreatePost.jsx";
 import PostDetail from "./pages/PostDetail.jsx";
 import EditPost from "./pages/EditPost.jsx";
+import Profile from "./pages/Profile.jsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/blogPosts/:id" element={<PostDetail />} />
         <Route path="/create" element={<CreatePost />} />
         <Route path="/edit/:id" element={<EditPost />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

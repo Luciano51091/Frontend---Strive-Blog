@@ -68,7 +68,24 @@ export default function PostDetail() {
   };
 
   const insertFormat = (tag) => {
-    setNewComment((prev) => `${prev}${tag}testo${tag}`);
+    // Recuperiamo l'elemento textarea dal DOM
+    const textarea = document.getElementById("commentArea");
+    const start = textarea.selectionStart; // Inizio selezione mouse
+    const end = textarea.selectionEnd; // Fine selezione mouse
+    const text = textarea.value;
+
+    // Testo evidenziato
+    const selectedText = text.substring(start, end);
+
+    // Se non c'è selezione, usiamo "testo", altrimenti usiamo la parola evidenziata
+    const replacement = selectedText.length > 0 ? selectedText : "testo";
+
+    const newText = text.substring(0, start) + tag + replacement + tag + text.substring(end);
+
+    setNewComment(newText);
+
+    // Riporta il focus sulla textarea
+    textarea.focus();
   };
 
   const handleUpdateComment = async (commentId) => {
@@ -90,6 +107,33 @@ export default function PostDetail() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const insertFormatEdit = (tag) => {
+    const textarea = document.getElementById("editCommentArea");
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = editText;
+
+    const selectedText = text.substring(start, end);
+    const replacement = selectedText.length > 0 ? selectedText : "testo";
+
+    const newText = text.substring(0, start) + tag + replacement + tag + text.substring(end);
+
+    setEditText(newText);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + tag.length + replacement.length + tag.length);
+    }, 0);
+  };
+
+  // Funzione specifica per le emoji in fase di modifica
+  const onEmojiClickEdit = (emojiData) => {
+    setEditText((prev) => prev + emojiData.emoji);
+    setShowEmojiPicker(false);
   };
 
   const handleDeleteComment = async (commentId) => {
@@ -153,6 +197,7 @@ export default function PostDetail() {
             </div>
           </div>
           <textarea
+            id="commentArea"
             className="form-control mb-2"
             rows="3"
             placeholder="Scrivi un commento..."
@@ -192,8 +237,30 @@ export default function PostDetail() {
                   </div>
 
                   {editingCommentId === comment._id ? (
-                    <div className="mt-2">
-                      <textarea className="form-control mb-2" value={editText} onChange={(e) => setEditText(e.target.value)} />
+                    // INTERFACCIA DI MODIFICA POTENZIATA
+                    <div className="mt-2 p-3 border rounded bg-light">
+                      {/* Toolbar per l'Editing */}
+                      <div className="d-flex gap-2 mb-2">
+                        <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => insertFormatEdit("**")}>
+                          <i className="bi bi-type-bold"></i>
+                        </button>
+                        <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => insertFormatEdit("*")}>
+                          <i className="bi bi-type-italic"></i>
+                        </button>
+                        <div className="position-relative">
+                          <button type="button" className="btn btn-sm btn-outline-warning" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                            😀
+                          </button>
+                          {showEmojiPicker && (
+                            <div className="position-absolute z-3 mt-2">
+                              <EmojiPicker onEmojiClick={onEmojiClickEdit} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <textarea id="editCommentArea" className="form-control mb-2" value={editText} onChange={(e) => setEditText(e.target.value)} />
+
                       <div className="d-flex gap-2">
                         <button className="btn btn-success btn-sm" onClick={() => handleUpdateComment(comment._id)}>
                           Salva

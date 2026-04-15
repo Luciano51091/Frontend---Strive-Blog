@@ -56,10 +56,10 @@ export default function Navbar() {
       <div className="ms-auto d-flex align-items-center">
         {user && (
           <>
-            {/* Aggiungiamo il link per creare un nuovo post */}
-            <Link to="/create" className="btn btn-outline-light btn-sm me-3">
-              Scrivi Post
+            <Link to="/profile" className="btn btn-outline-light btn-sm me-3">
+              Il mio Profilo
             </Link>
+
             <span className="text-white me-3">
               Ciao, <strong>{user.name}</strong>!
             </span>
