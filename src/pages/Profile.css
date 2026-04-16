@@ -79,3 +79,18 @@
   font-weight: 600;
   color: #333;
 }
+.border-top {
+  border-top: 1px dashed #dee2e6 !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}

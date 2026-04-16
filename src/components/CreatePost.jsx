@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import "./CreatePost.css";
 
 export default function CreatePost() {
   const [form, setForm] = useState({
@@ -10,8 +11,19 @@ export default function CreatePost() {
   });
 
   const [cover, setCover] = useState(null);
-
+  const [preview, setPreview] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!cover) {
+      setPreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(cover);
+    setPreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [cover]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +63,6 @@ export default function CreatePost() {
       });
 
       if (res.ok) {
-        alert("Post creato con successo!");
         navigate("/homepage");
       }
     } catch (err) {
@@ -60,40 +71,67 @@ export default function CreatePost() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="card p-4 shadow">
-        <h2>Crea un nuovo articolo</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Titolo</label>
-            <input name="title" className="form-control" onChange={handleChange} required />
-          </div>
+    <div className="create-post-container">
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-lg-8">
+            <div className="create-post-card">
+              <div className="create-post-header">
+                <h2>Crea un nuovo articolo</h2>
+                <p className="mb-0 opacity-75">Condividi le tue conoscenze con la community</p>
+              </div>
 
-          <div className="mb-3">
-            <label className="form-label">Categoria</label>
-            <input name="category" className="form-control" onChange={handleChange} required />
-          </div>
+              <div className="create-post-body">
+                <form onSubmit={handleSubmit}>
+                  {/* Anteprima Immagine */}
+                  <div className="image-preview-wrapper">
+                    {preview ? (
+                      <img src={preview} alt="Anteprima" />
+                    ) : (
+                      <div className="text-center text-muted">
+                        <i className="bi bi-cloud-arrow-up d-block" style={{ fontSize: "2.5rem" }}></i>
+                        <span>Nessuna immagine selezionata</span>
+                      </div>
+                    )}
+                  </div>
 
-          {/* CAMPO PER L'IMMAGINE */}
-          <div className="mb-3">
-            <label className="form-label">Immagine di Copertina</label>
-            <input type="file" className="form-control" onChange={handleFileChange} accept="image/*" />
-          </div>
+                  <div className="mb-4">
+                    <label className="form-label">Titolo dell'articolo</label>
+                    <input name="title" className="form-control" placeholder="Inserisci un titolo accattivante..." onChange={handleChange} required />
+                  </div>
 
-          <div className="mb-3">
-            <label className="form-label">Contenuto</label>
-            <textarea name="content" className="form-control" rows="5" onChange={handleChange} required />
-          </div>
+                  <div className="row">
+                    <div className="col-md-6 mb-4">
+                      <label className="form-label">Categoria</label>
+                      <input name="category" className="form-control" placeholder="Esempio: Tech, Food, Travel" onChange={handleChange} required />
+                    </div>
+                    <div className="col-md-6 mb-4">
+                      <label className="form-label">Immagine di Copertina</label>
+                      <input type="file" className="form-control" onChange={handleFileChange} accept="image/*" />
+                    </div>
+                  </div>
 
-          <div className="mb-3">
-            <label className="form-label">Tempo di lettura (minuti)</label>
-            <input name="readTimeValue" type="number" className="form-control" onChange={handleChange} />
-          </div>
+                  <div className="mb-4">
+                    <label className="form-label">Contenuto</label>
+                    <textarea name="content" className="form-control" rows="8" placeholder="Scrivi qui il tuo articolo..." onChange={handleChange} required />
+                  </div>
 
-          <button type="submit" className="btn btn-success w-100">
-            Pubblica
-          </button>
-        </form>
+                  <div className="mb-5">
+                    <label className="form-label">Tempo di lettura stimato (minuti)</label>
+                    <div className="input-group" style={{ maxWidth: "200px" }}>
+                      <input name="readTimeValue" type="number" className="form-control" min="1" value={form.readTime.value} onChange={handleChange} />
+                      <span className="input-group-text">min</span>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="btn btn-publish text-white w-100 shadow-sm">
+                    Pubblica l'articolo
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

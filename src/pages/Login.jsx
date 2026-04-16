@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link, Navigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { useSearchParams } from "react-router";
+import "./Login.css";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -14,7 +15,7 @@ export default function Login() {
       window.dispatchEvent(new Event("loginSuccess"));
       navigate("/homepage");
     }
-  }, [searchParams, Navigate]);
+  }, [searchParams, navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -47,27 +48,53 @@ export default function Login() {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Accedi a Strive Blog</h2>
-      <form onSubmit={handleSubmit} className="w-50">
-        <div className="mb-3">
-          <input name="email" type="email" className="form-control" placeholder="Email" onChange={handleChange} required />
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-side-info d-none d-md-flex">
+          <i className="bi bi-journal-text" style={{ fontSize: "4rem" }}></i>
+          <h1 className="mt-3">Strive Blog</h1>
+          <p className="opacity-75">La tua community di tech & lifestyle preferita.</p>
         </div>
-        <div className="mb-3">
-          <input name="password" type="password" className="form-control" placeholder="Password" onChange={handleChange} required />
+
+        <div className="login-side-form">
+          <div className="login-header mb-4">
+            <h2>Bentornato!</h2>
+            <p className="text-muted">Inserisci le tue credenziali per accedere.</p>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-floating mb-3">
+              <input name="email" type="email" className="form-control" id="floatingEmail" placeholder="name@example.com" onChange={handleChange} required />
+              <label htmlFor="floatingEmail">Indirizzo Email</label>
+            </div>
+
+            <div className="form-floating mb-3">
+              <input name="password" type="password" className="form-control" id="floatingPassword" placeholder="Password" onChange={handleChange} required />
+              <label htmlFor="floatingPassword">Password</label>
+            </div>
+
+            <button type="submit" className="btn btn-primary w-100 btn-login mb-3">
+              Accedi ora
+            </button>
+          </form>
+
+          <div className="text-center my-3">
+            <span className="text-muted">oppure</span>
+          </div>
+
+          <button onClick={handleGoogleLogin} className="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2 mb-4">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: "18px" }} />
+            Continua con Google
+          </button>
+
+          <p className="text-center mb-0">
+            Non hai ancora un account?{" "}
+            <Link to="/register" className="text-decoration-none fw-bold">
+              Registrati qui
+            </Link>
+          </p>
         </div>
-        <button type="submit" className="btn btn-primary">
-          Login
-        </button>
-      </form>
-      <hr />
-      <button onClick={handleGoogleLogin} className="btn btn-outline-dark w-50 d-flex align-items-center justify-content-center gap-2">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: "20px" }} />
-        Accedi con Google
-      </button>
-      <p className="mt-3">
-        Non hai un account? <Link to="/register">Registrati qui</Link>
-      </p>
+      </div>
     </div>
   );
 }

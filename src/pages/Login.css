@@ -1,0 +1,78 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+}
+
+.login-side-info {
+  background: #0d6efd;
+  color: white;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 40%;
+}
+
+.login-side-form {
+  padding: 40px;
+  width: 60%;
+}
+
+.login-header h2 {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.form-floating > .form-control {
+  border-radius: 8px;
+}
+
+.btn-login {
+  padding: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-google {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  background: white;
+  transition: background 0.2s;
+}
+
+.btn-google:hover {
+  background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .login-card {
+    flex-direction: column;
+  }
+  .login-side-info {
+    width: 100%;
+    padding: 20px;
+  }
+  .login-side-form {
+    width: 100%;
+    padding: 30px 20px;
+  }
+}

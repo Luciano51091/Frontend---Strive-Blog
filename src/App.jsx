@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router";
 import Login from "./pages/Login";
 import Register from "./pages/Register.jsx";
 import Home from "./pages/Home.jsx";
@@ -9,10 +9,22 @@ import PostDetail from "./pages/PostDetail.jsx";
 import EditPost from "./pages/EditPost.jsx";
 import Profile from "./pages/Profile.jsx";
 
+function NavbarWrapper() {
+  const location = useLocation();
+
+  const noNavbarPaths = ["/", "/login", "/register"];
+
+  if (noNavbarPaths.includes(location.pathname)) {
+    return null;
+  }
+
+  return <Navbar />;
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      <NavbarWrapper />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />

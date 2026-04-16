@@ -19,12 +19,10 @@ export default function Profile() {
   useEffect(() => {
     const fetchMeAndPosts = async () => {
       try {
-        // Fetch Dati Profilo
         const res = await fetch("http://localhost:3000/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Fetch Miei Post
         const resPosts = await fetch("http://localhost:3000/blogPosts/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -69,7 +67,7 @@ export default function Profile() {
       console.error(err);
     }
   };
-
+  // MODIFICA ACCOUNT
   const handleAvatarUpload = async () => {
     if (!avatarFile) return;
     const uploadData = new FormData();
@@ -89,6 +87,59 @@ export default function Profile() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+  // ELIMINAZIONE ACCOUNT
+  const handleDeleteAccount = async () => {
+    if (!me || !me._id) {
+      alert("Errore: dati utente non caricati. Riprova tra un istante.");
+      return;
+    }
+
+    const confirmDelete = window.confirm("ATTENZIONE: Eliminando il tuo account, verranno cancellati PER SEMPRE anche tutti i tuoi articoli. Vuoi procedere?");
+
+    if (confirmDelete) {
+      try {
+        const res = await fetch(`http://localhost:3000/authors/${me._id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          alert("Account e contenuti eliminati. Ci dispiace vederti andare via!");
+          localStorage.removeItem("token");
+          navigate("/login");
+        } else {
+          const errorData = await res.json();
+          alert(errorData.message || "Errore durante l'eliminazione.");
+        }
+      } catch (err) {
+        console.error("Errore delete:", err);
+        alert("Errore di connessione.");
+      }
+    }
+  };
+
+  // ELIMINAZIONE SINGOLO POST
+  const handleDeletePost = async (postId) => {
+    const confirmDelete = window.confirm("Sei sicuro di voler eliminare questo articolo?");
+
+    if (confirmDelete) {
+      try {
+        const res = await fetch(`http://localhost:3000/blogPosts/${postId}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          setMyPosts(myPosts.filter((post) => post._id !== postId));
+          alert("Post eliminato correttamente.");
+        } else {
+          alert("Errore durante l'eliminazione del post.");
+        }
+      } catch (err) {
+        console.error("Errore delete post:", err);
+      }
     }
   };
 
@@ -142,6 +193,15 @@ export default function Profile() {
                     <button onClick={() => setIsEditing(true)} className="btn btn-primary w-100 mt-3 rounded-pill py-2">
                       <i className="bi bi-pencil-square me-2"></i> Modifica Profilo
                     </button>
+                    {!isEditing && (
+                      <div className="mt-5 pt-3 border-top">
+                        <p className="text-muted small">!! ATTENZIONE !!</p>
+                        <button onClick={handleDeleteAccount} className="btn btn-outline-danger btn-sm w-100 rounded-pill">
+                          <i className="bi bi-exclamation-triangle me-2"></i>
+                          Elimina Account Definitivamente
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <form onSubmit={handleUpdateInfo} className="text-start mt-4">
@@ -199,12 +259,19 @@ export default function Profile() {
                       <img src={post.cover} className="card-img-top" alt={post.title} style={{ height: "150px", objectFit: "cover" }} />
                       <div className="card-body">
                         <h5 className="card-title text-truncate">{post.title}</h5>
-                        <div className="d-flex gap-2">
-                          <button onClick={() => navigate(`/blogPosts/${post._id}`)} className="btn btn-sm btn-outline-primary">
-                            <i className="bi bi-eye"></i>
-                          </button>
-                          <button onClick={() => navigate(`/edit/${post._id}`)} className="btn btn-sm btn-outline-warning">
-                            <i className="bi bi-pencil"></i>
+                        <div className="d-flex gap-2 justify-content-between align-items-center mt-3">
+                          <div className="d-flex gap-2">
+                            <button onClick={() => navigate(`/blogPosts/${post._id}`)} className="btn btn-sm btn-outline-primary" title="Visualizza">
+                              <i className="bi bi-eye"></i>
+                            </button>
+                            <button onClick={() => navigate(`/edit/${post._id}`)} className="btn btn-sm btn-outline-warning" title="Modifica">
+                              <i className="bi bi-pencil"></i>
+                            </button>
+                          </div>
+
+                          {/* NUOVO TASTO ELIMINA */}
+                          <button onClick={() => handleDeletePost(post._id)} className="btn btn-sm btn-outline-danger" title="Elimina">
+                            <i className="bi bi-trash"></i>
                           </button>
                         </div>
                       </div>
