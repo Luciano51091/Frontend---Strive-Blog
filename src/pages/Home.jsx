@@ -12,43 +12,42 @@ export default function Home() {
   const query = new URLSearchParams(location.search);
   const searchTerm = query.get("title") || "";
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
+  const fetchPosts = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`http://localhost:3000/blogPosts?page=${page}&limit=6&title=${searchTerm}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const meResponse = await fetch("http://localhost:3000/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok && meResponse.ok) {
+        const data = await response.json();
+        const meData = await meResponse.json();
+
+        setPosts(data.posts || []);
+        setTotalPages(data.totalPages || 1);
+        setMe(meData);
+      } else {
+        localStorage.removeItem("token");
         navigate("/login");
-        return;
       }
-
-      setIsLoading(true);
-
-      try {
-        const response = await fetch(`http://localhost:3000/blogPosts?page=${page}&limit=6&title=${searchTerm}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const meResponse = await fetch("http://localhost:3000/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.ok && meResponse.ok) {
-          const data = await response.json();
-          const meData = await meResponse.json();
-
-          setPosts(data.posts || []);
-          setTotalPages(data.totalPages || 1);
-          setMe(meData);
-        } else {
-          localStorage.removeItem("token");
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Errore caricamento post:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+    } catch (error) {
+      console.error("Errore caricamento post:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchPosts();
   }, [navigate, page, searchTerm]);
 
@@ -67,6 +66,7 @@ export default function Home() {
       if (response.ok) {
         setPosts(posts.filter((post) => post._id !== postId));
         alert("Post eliminato con successo!");
+        fetchPosts();
       } else {
         const errorData = await response.json();
         alert(errorData.message || "Errore durante l'eliminazione");
@@ -122,7 +122,7 @@ export default function Home() {
                       <span className="badge rounded-pill bg-outline-info text-primary">{post.category}</span>
                     </div>
 
-                    {me && post.author === me.email && (
+                    {me && (post.author?._id === me._id || post.author === me._id) && (
                       <div className="d-flex align-items-center gap-3">
                         <Link to={`/edit/${post._id}`} className="text-warning">
                           <i className="bi bi-pencil fs-5"></i>
