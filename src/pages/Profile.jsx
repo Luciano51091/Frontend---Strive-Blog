@@ -29,6 +29,7 @@ export default function Profile() {
 
         if (res.ok && resPosts.ok) {
           const data = await res.json();
+          console.log("Dati utente loggato:", data);
           const postsData = await resPosts.json();
 
           setMe(data);
@@ -158,7 +159,14 @@ export default function Profile() {
 
               <div className="card-body p-4 text-center">
                 <div className="avatar-wrapper mb-4">
-                  <img src={me.avatar} alt="Avatar" className="rounded-circle profile-avatar" />
+                  <img
+                    src={me.avatar || "https://via.placeholder.com/150"}
+                    alt="Avatar"
+                    className="rounded-circle profile-avatar"
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/150";
+                    }}
+                  />
                   <label htmlFor="avatar-input" className="upload-label">
                     <i className="bi bi-camera-fill text-primary"></i>
                   </label>
