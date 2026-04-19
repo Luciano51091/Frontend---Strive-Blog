@@ -21,7 +21,7 @@ export default function PostDetail() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const meRes = await fetch("${import.meta.env.VITE_API_URL}/auth/me", {
+        const meRes = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
