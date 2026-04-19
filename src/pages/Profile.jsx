@@ -19,11 +19,11 @@ export default function Profile() {
   useEffect(() => {
     const fetchMeAndPosts = async () => {
       try {
-        const res = await fetch("http://localhost:3000/auth/me", {
+        const res = await fetch("${import.meta.env.VITE_API_URL}/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const resPosts = await fetch("http://localhost:3000/blogPosts/me", {
+        const resPosts = await fetch("${import.meta.env.VITE_API_URL}/blogPosts/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -50,7 +50,7 @@ export default function Profile() {
   const handleUpdateInfo = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:3000/authors/${me._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/authors/${me._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export default function Profile() {
     uploadData.append("avatar", avatarFile);
 
     try {
-      const res = await fetch(`http://localhost:3000/authors/${me._id}/avatar`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/authors/${me._id}/avatar`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
         body: uploadData,
@@ -101,7 +101,7 @@ export default function Profile() {
 
     if (confirmDelete) {
       try {
-        const res = await fetch(`http://localhost:3000/authors/${me._id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/authors/${me._id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -127,7 +127,7 @@ export default function Profile() {
 
     if (confirmDelete) {
       try {
-        const res = await fetch(`http://localhost:3000/blogPosts/${postId}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${postId}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });

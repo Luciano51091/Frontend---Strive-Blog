@@ -15,7 +15,7 @@ export default function EditPost() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/blogPosts/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
@@ -37,7 +37,7 @@ export default function EditPost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:3000/blogPosts/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export default function EditPost() {
     formData.append("cover", coverFile);
 
     try {
-      const res = await fetch(`http://localhost:3000/blogPosts/${id}/cover`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${id}/cover`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

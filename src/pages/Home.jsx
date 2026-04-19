@@ -22,11 +22,11 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:3000/blogPosts?page=${page}&limit=6&title=${searchTerm}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts?page=${page}&limit=6&title=${searchTerm}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const meResponse = await fetch("http://localhost:3000/auth/me", {
+      const meResponse = await fetch("${import.meta.env.VITE_API_URL}/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -58,7 +58,7 @@ export default function Home() {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`http://localhost:3000/blogPosts/${postId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${postId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

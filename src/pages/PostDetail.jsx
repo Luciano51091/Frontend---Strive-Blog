@@ -17,11 +17,11 @@ export default function PostDetail() {
     const fetchPost = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch(`http://localhost:3000/blogPosts/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const meRes = await fetch("http://localhost:3000/auth/me", {
+        const meRes = await fetch("${import.meta.env.VITE_API_URL}/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -44,7 +44,7 @@ export default function PostDetail() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:3000/blogPosts/${id}/comments`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${id}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ export default function PostDetail() {
   const handleUpdateComment = async (commentId) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:3000/blogPosts/${id}/comments/${commentId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${id}/comments/${commentId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +140,7 @@ export default function PostDetail() {
     if (!window.confirm("Sei sicuro?")) return;
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:3000/blogPosts/${id}/comments/${commentId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/${id}/comments/${commentId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

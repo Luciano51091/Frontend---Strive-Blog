@@ -35,7 +35,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/authors", {
+      const response = await fetch("${import.meta.env.VITE_API_URL}/authors", {
         method: "POST",
 
         body: formData,
