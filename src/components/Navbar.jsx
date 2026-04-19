@@ -13,7 +13,7 @@ export default function Navbar() {
         return;
       }
       try {
-        const res = await fetch("${import.meta.env.VITE_API_URL}/auth/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {

@@ -19,11 +19,11 @@ export default function Profile() {
   useEffect(() => {
     const fetchMeAndPosts = async () => {
       try {
-        const res = await fetch("${import.meta.env.VITE_API_URL}/auth/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const resPosts = await fetch("${import.meta.env.VITE_API_URL}/blogPosts/me", {
+        const resPosts = await fetch(`${import.meta.env.VITE_API_URL}/blogPosts/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

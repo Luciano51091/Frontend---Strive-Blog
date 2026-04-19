@@ -26,7 +26,7 @@ export default function Home() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const meResponse = await fetch("${import.meta.env.VITE_API_URL}/auth/me", {
+      const meResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
